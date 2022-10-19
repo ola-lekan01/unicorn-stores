@@ -1,13 +1,10 @@
 package com.natives.data.repositories;
 
 import com.natives.data.models.Vendor;
-import com.natives.exceptions.BuyerNotFoundException;
 import com.natives.exceptions.VendorNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,11 +65,16 @@ class VendorRepositoryImplTest {
     @Test
     void delete() {
         var savedVendor = vendorRepository.save(firstVendor);
-        var savedVendor2 = vendorRepository.save(secondVendor);
-        assertEquals(2, vendorRepository.findAll().size());
-        vendorRepository.delete(savedVendor);
         assertEquals(1, vendorRepository.findAll().size());
-        var finalSavedVendor = savedVendor;
-        assertThrows(VendorNotFoundException.class, ()-> vendorRepository.delete(finalSavedVendor));
+        vendorRepository.delete(savedVendor);
+        assertThrows(VendorNotFoundException.class, ()-> vendorRepository.findById(savedVendor.getId()));
+    }
+
+    @Test
+    void testThatExceptionIsThrownWhenDeleteFails(){
+        var firstV = vendorRepository.save(firstVendor);
+        var secondV = vendorRepository.save(secondVendor);
+        vendorRepository.delete(firstV);
+        assertThrows(VendorNotFoundException.class, ()-> vendorRepository.delete(firstV));
     }
 }

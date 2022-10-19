@@ -9,7 +9,7 @@ import java.util.List;
 public interface ProductRepository {
     Product save(Product product);
     Product findById(int id);
-    Product findByCategory(Category category);
+    List<Product> findByCategory(Category category);
     List<Product> findAll();
     void delete(Product product);
 

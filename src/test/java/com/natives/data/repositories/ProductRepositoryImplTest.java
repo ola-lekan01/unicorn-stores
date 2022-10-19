@@ -1,16 +1,12 @@
 package com.natives.data.repositories;
 
-import com.natives.data.models.Buyer;
-import com.natives.data.models.Category;
 import com.natives.data.models.Product;
-import com.natives.exceptions.BuyerNotFoundException;
 import com.natives.exceptions.ProductNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static com.natives.data.models.Category.COMPUTING;
 import static com.natives.data.models.Category.ELECTRONICS;
@@ -19,16 +15,22 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductRepositoryImplTest {
     private Product product;
     private Product product2;
-    private ProductRepository productRepository = new ProductRepositoryImpl();
+    private Product product3;
+    private final ProductRepository productRepository = new ProductRepositoryImpl();
 
     @BeforeEach
     void setUp(){
         product = new Product();
         product2 = new Product();
+        product3 = new Product();
 
         product.setName("Television");
         product.setCategory(ELECTRONICS);
         product.setPrice(BigDecimal.valueOf(5000));
+
+        product3.setName("Radio");
+        product3.setCategory(ELECTRONICS);
+        product3.setPrice(BigDecimal.valueOf(1500));
 
         product2.setName("Laptop");
         product2.setCategory(COMPUTING);
@@ -59,8 +61,10 @@ class ProductRepositoryImplTest {
     @Test
     void findByCategory() {
         var savedProduct = productRepository.save(product);
+        var savedProduct1 = productRepository.save(product3);
         var foundProduct = productRepository.findByCategory(ELECTRONICS);
-        assertEquals(savedProduct, foundProduct);
+        assertEquals(savedProduct.getCategory(), foundProduct.get(0).getCategory());
+        assertEquals(savedProduct1.getCategory(), foundProduct.get(1).getCategory());
     }
 
     @Test
@@ -74,12 +78,15 @@ class ProductRepositoryImplTest {
     @Test
     void delete() {
         var savedProduct = productRepository.save(product2);
-        var savedProduct2 = productRepository.save(product);
-        assertEquals(2,  productRepository.findAll().size());
+        assertEquals(1,  productRepository.findAll().size());
         productRepository.delete(savedProduct);
-        assertEquals(1, productRepository.findAll().size());
-        var finalSavedProduct = savedProduct;
-        assertThrows(ProductNotFoundException.class, ()-> productRepository.delete(finalSavedProduct));
+        assertThrows(ProductNotFoundException.class, () -> productRepository.findById(savedProduct.getId()));
+    }
 
+    @Test
+    void testThatNonExistingProductThrowsException(){
+        var savedProduct = productRepository.save(product2);
+        productRepository.delete(savedProduct);
+        assertThrows(ProductNotFoundException.class, ()-> productRepository.delete(savedProduct));
     }
 }

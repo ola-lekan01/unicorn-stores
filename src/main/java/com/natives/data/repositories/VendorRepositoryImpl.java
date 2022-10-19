@@ -4,7 +4,6 @@ import com.natives.data.models.Vendor;
 import com.natives.exceptions.VendorNotFoundException;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 
 public class VendorRepositoryImpl implements VendorRepository {
@@ -34,10 +33,8 @@ public class VendorRepositoryImpl implements VendorRepository {
     }
     @Override
     public void delete(Vendor vendor) {
-        for (var vendorsCount : vendors) {
-            if(vendorsCount.equals(vendor))vendors.remove(vendor);
-            else throw new VendorNotFoundException("Vendor Not Found");
-        }
+       var removedVendor = vendors.remove(vendor);
+       if (!removedVendor) throw new VendorNotFoundException("Vendor Not Found");
     }
 
     @Override

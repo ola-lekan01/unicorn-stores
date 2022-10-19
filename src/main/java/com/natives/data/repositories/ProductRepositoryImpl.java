@@ -9,7 +9,8 @@ import java.util.List;
 
 public class ProductRepositoryImpl implements ProductRepository {
 
-    private List<Product> products = new ArrayList<>();
+    private final List<Product> products = new ArrayList<>();
+    private final List<Product> foundProducts = new ArrayList<>();
     @Override
     public Product save(Product product) {
         product.setId(generateId());
@@ -30,11 +31,12 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public Product findByCategory(Category category) {
+    public List<Product> findByCategory(Category category) {
         for (var product : products) {
-            if(product.getCategory() == category) return product;
+            if(product.getCategory() == category) foundProducts.add(product);
         }
-        throw new ProductNotFoundException("Product Not found Exception");
+        if(foundProducts.isEmpty()) throw new ProductNotFoundException("Product Not found Exception");
+        return foundProducts;
     }
 
     @Override
@@ -44,10 +46,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public void delete(Product product) {
-        for(var varProduct : products) {
-           if(varProduct.equals(product)) products.remove(product);
-           else throw new ProductNotFoundException("Product Not found Exception");
-        }
+        var removedProducts = products.remove(product);
+        if(!removedProducts)throw new ProductNotFoundException("Product Not found Exception");
     }
 
     @Override

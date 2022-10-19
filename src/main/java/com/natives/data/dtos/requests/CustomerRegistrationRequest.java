@@ -1,9 +1,8 @@
-package com.natives.data.dtos;
+package com.natives.data.dtos.requests;
 
 import lombok.Data;
-
 @Data
-public class BuyerRegistrationRequest {
+public class CustomerRegistrationRequest {
     private String email;
     private String address;
     private String phoneNumber;
