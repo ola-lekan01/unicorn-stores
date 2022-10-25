@@ -5,10 +5,12 @@ import com.natives.data.dtos.responses.AddProductResponse;
 import com.natives.data.models.Category;
 import com.natives.data.models.Product;
 import com.natives.data.repositories.ProductRepository;
-import com.natives.data.repositories.ProductRepositoryImpl;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@AllArgsConstructor
 public class ProductServiceImpl implements ProductService{
-    ProductRepository productRepository = new ProductRepositoryImpl();
+    private static ProductRepository productRepository;
     @Override
     public AddProductResponse addProduct(AddProductRequest addproductRequest) {
         Product product = new Product();
@@ -28,5 +30,10 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public Product getProductById(int id) {
         return productRepository.findById(id);
+    }
+
+    @Override
+    public Product save(Product product) {
+        return productRepository.save(product);
     }
 }

@@ -11,10 +11,13 @@ import com.natives.data.repositories.*;
 import com.natives.exceptions.OrderNotFoundException;
 import com.natives.exceptions.ProductNotFoundException;
 import com.natives.utils.validators.AccountValidation;
+import lombok.AllArgsConstructor;
+
 import java.util.Set;
 
+@AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-    private final CustomerRepository customerRepository = new CustomerRepositoryImpl();
+    private final CustomerRepository customerRepository;
     private final AccountValidation accountValidation = new AccountValidation();
     private final ProductService productService = new ProductServiceImpl();
 
@@ -65,7 +68,9 @@ public class CustomerServiceImpl implements CustomerService {
         //validate quantity exists
         if(product.getQuantity() >= productPurchaseRequest.getQuantity()){
             customer.getOrders().add(product);
+            product.setQuantity(product.getQuantity() - productPurchaseRequest.getQuantity());
             customerRepository.save(customer);
+
             return "Order Successful";
         }
         else throw new OrderNotFoundException("Order Not Found Exception");

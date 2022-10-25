@@ -1,5 +1,7 @@
 package com.natives;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.natives.data.dtos.requests.CustomerRegistrationRequest;
 import com.natives.data.dtos.requests.LoginRequest;
 import com.natives.services.CustomerService;
@@ -8,19 +10,26 @@ import com.natives.services.ProductService;
 import com.natives.services.ProductServiceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 @SpringBootApplication
 
 public class Main {
-    private static final Scanner reader = new Scanner(System.in);
+//    private static final Scanner reader = new Scanner(System.in);
     private static final CustomerService customerService = new CustomerServiceImpl();
     private static final ProductService productService = new ProductServiceImpl();
-    public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+    public static void main(String[] args) throws IOException {
+        setUp();
     }
 
-    public static void setUp(){
+    public static void setUp() throws IOException {
         prompt();
         int intent = getCustomerInput();
         processCustomerRequest(intent);
@@ -37,23 +46,44 @@ public class Main {
                 """);
     }
 
-    private static int getCustomerInput(){
-        return reader.nextInt();
+    private static int getCustomerInput() throws IOException {
+        return reader.read();
     }
 
-    private static void processCustomerRequest(int intent){
+    private static void processCustomerRequest(int intent) throws IOException {
+        System.out.println("""
+                Registration Page
+                """);
         if (intent == 1) {
             var registeredCustomerRequest = customerRegistrationForm();
+
             var registeredCustomerResponse = customerService.register(registeredCustomerRequest);
-            System.out.println(registeredCustomerResponse);
+
+            try {
+                var jsonResponse = mapper.writeValueAsString(registeredCustomerResponse);
+                System.out.println(jsonResponse);
+
+            } catch (JsonProcessingException exception) {
+                throw new RuntimeException(exception);
+            }
         }
 
         if(intent == 2){
+            System.out.println("""
+                Login Page
+                """);
            var loginRequest = customerLogin();
            var loginResponse = customerService.login(loginRequest);
-            System.out.println(loginResponse);
+
+            try {
+                mapper.writeValueAsString(loginResponse);
+                System.out.println(loginResponse);
+
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
-        if(intent ==3){
+        if (intent ==3){
 
         }
         if (intent == 4) System.exit(4);
@@ -61,7 +91,7 @@ public class Main {
         setUp();
     }
 
-    private static LoginRequest customerLogin() {
+    private static LoginRequest customerLogin() throws IOException {
         LoginRequest loginRequest = new LoginRequest();
 
         var email = getEmailAddress();
@@ -73,17 +103,17 @@ public class Main {
         return loginRequest;
     }
 
-    private static CustomerRegistrationRequest customerRegistrationForm() {
+    private static CustomerRegistrationRequest customerRegistrationForm() throws IOException {
         CustomerRegistrationRequest customerRegistrationRequest = new CustomerRegistrationRequest();
 
         var email = getEmailAddress();
         customerRegistrationRequest.setEmail(email);
 
-        System.out.println("Address: ");
-        customerRegistrationRequest.setAddress(reader.next());
+        System.out.println("Enter Address: ");
+        customerRegistrationRequest.setAddress(reader.readLine());
 
         System.out.println("Enter Phone Number: ");
-        customerRegistrationRequest.setPhoneNumber(reader.next());
+        customerRegistrationRequest.setPhoneNumber(reader.readLine());
 
         var password = getPassword();
         customerRegistrationRequest.setPassword(password);
@@ -91,16 +121,15 @@ public class Main {
         return customerRegistrationRequest;
     }
 
-    private static String getPassword() {
+    private static String getPassword() throws IOException {
         System.out.println("Enter Password: ");
-        return reader.next();
+        return reader.readLine();
     }
 
 
-    private static String getEmailAddress() {
+    private static String getEmailAddress() throws IOException {
         System.out.println("Enter Email: ");
-        return reader.next();
+        return reader.readLine();
     }
-
 
 }
