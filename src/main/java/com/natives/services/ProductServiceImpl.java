@@ -6,7 +6,6 @@ import com.natives.data.models.Category;
 import com.natives.data.models.Product;
 import com.natives.data.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService{

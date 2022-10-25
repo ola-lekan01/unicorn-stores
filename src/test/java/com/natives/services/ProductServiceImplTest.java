@@ -3,11 +3,13 @@ package com.natives.services;
 import com.natives.data.dtos.requests.AddProductRequest;
 import com.natives.data.dtos.responses.AddProductResponse;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductServiceImplTest {
-    private final ProductService productService = new ProductServiceImpl();
+    private ProductService productService;
     AddProductRequest addProductRequest;
 
     @BeforeEach
